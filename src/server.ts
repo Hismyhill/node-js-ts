@@ -1,6 +1,8 @@
 import express, { Response, Request } from "express";
 import morgan from "morgan";
 import cors from "cors";
+import config from "./config";
+import v1 from "./routes/v1";
 
 export function createServer() {
   const app = express();
@@ -12,8 +14,10 @@ export function createServer() {
     .use(cors());
 
   app.get("/health", (req: Request, res: Response) => {
-    res.json({ ok: true });
+    res.json({ ok: true, environment: config.env });
   });
+
+  app.use("/v1", v1);
 
   return app;
 }
