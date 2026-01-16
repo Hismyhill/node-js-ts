@@ -9,6 +9,7 @@ const config = {
   host: process.env.DB_HOST || "localhost",
   db_user: process.env.DB_USER || "root",
   db_password: process.env.DB_PASSWORD || "secret",
+  appSecret: process.env.APP_SECRET || "",
 };
 
 export default config;
