@@ -3,7 +3,7 @@ import { clear } from "node:console";
 class CustomError<C extends string> extends Error {
   message: string;
   statusCode: number;
-  code?: C;
+  code?: C | undefined;
 
   constructor({
     message,
@@ -17,7 +17,7 @@ class CustomError<C extends string> extends Error {
     super();
     this.message = message;
     this.statusCode = statusCode;
-    this.code = code;
+    this.code = code || undefined;
   }
 }
 
