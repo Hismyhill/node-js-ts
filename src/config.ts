@@ -10,6 +10,8 @@ const config = {
   db_user: process.env.DB_USER || "root",
   db_password: process.env.DB_PASSWORD || "secret",
   appSecret: process.env.APP_SECRET || "",
+  issuerBaseUrl: process.env.ISSUER_BASE_URL || "",
+  audience: process.env.AUDIENCE || "",
 };
 
 export default config;
