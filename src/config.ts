@@ -2,6 +2,7 @@ const config = {
   env: process.env.NODE_ENV || "development",
   port: parseInt(process.env.PORT ?? "3000"),
   debug: process.env.APP_DEBUG === "true",
+  logLevel: process.env.LOG_LEVEL || "info",
   db_url:
     process.env.DATABASE_URL ||
     "mysql://root:secret@localhost:33061/prisma_api",
