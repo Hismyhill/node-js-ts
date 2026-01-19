@@ -5,9 +5,13 @@
     "moduleResolution": "node",
     "outDir": "./dist",
     "rootDir": "./src",
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@errors/": ["src/errors/*"]
+    }
   },
-  // "isolatedModules": true,
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"],
   "ts-node": {
