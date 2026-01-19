@@ -19,8 +19,8 @@ model Task {
   user_id       String    @db.VarChar(36 )  // uuid field
   project_id    String?
   name          String
-  description   String    @db.Text
-  due_date      DateTime  @db.Date
+  description   String?    @db.Text
+  due_date      DateTime?  @db.Date
   completed_on  DateTime?  @db.DateTime()
   created_at    DateTime  @default(now())
   updated_at    DateTime  @updatedAt

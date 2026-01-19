@@ -1,9 +1,16 @@
 import express, { Router } from "express";
-import { listTasks, getTask } from "./controller";
+import { listTasks, getTask, createTask, updateTask } from "./controller";
+import validateRequest from "../../../middleware/validate-request";
+import {
+  createTaskSchema,
+  updateTaskSchema,
+} from "../../../data/request-schema";
 
 const tasks: Router = express.Router();
 
 tasks.get("/", listTasks);
 tasks.get("/:id", getTask);
+tasks.post("/", validateRequest(createTaskSchema), createTask);
+tasks.put("/:id", validateRequest(updateTaskSchema), updateTask);
 
 export default tasks;
