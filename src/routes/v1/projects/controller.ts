@@ -1,42 +1,27 @@
 import { Request, Response } from "express";
 import prisma from "../../../prisma-client";
 import EntityNotFoundError from "../../../errors/EntityNotFoundError";
+import { repository } from "@/data/repositories";
 
 export const listProjects = async (req: Request, res: Response) => {
-  const projects = await prisma.project.findMany({
-    where: {
-      user_id: req.auth?.payload.sub,
-    },
-  });
+  const projects = await repository.listProjects({}, req.auth?.payload.sub);
   res.status(200).json({ projects });
 };
 
 export const getProject = async (req: Request, res: Response) => {
-  const project = await prisma.project.findUnique({
-    where: {
-      id: req.params.id as string,
-      user_id: req.auth?.payload.sub,
-    },
-  });
-
-  if (!project)
-    throw new EntityNotFoundError({
-      message: "Project not found",
-      statusCode: 404,
-      code: "ERR_NF",
-    });
+  const project = await repository.getProject(
+    req.params.id as string,
+    req.auth?.payload.sub
+  );
 
   res.status(200).json({ project });
 };
 
 export const listProjectTasks = async (req: Request, res: Response) => {
-  const tasks = await prisma.task.findMany({
-    where: {
-      project_id: req.params.id as string,
-      user_id: req.auth?.payload.sub,
-    },
-  });
-
+  const tasks = await repository.listTasks(
+    { project_id: req.params.id as string },
+    req.auth?.payload.sub
+  );
   if (!tasks || tasks.length === 0)
     throw new EntityNotFoundError({
       message: "Tasks not found",

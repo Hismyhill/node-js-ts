@@ -1,5 +1,5 @@
 import CustomError from "./CustomError";
 
-class EntityNotFoundError extends CustomError<ErrorCode> {}
+class AuthenticationError extends CustomError<ErrorCode> {}
 
-export default EntityNotFoundError;
+export default AuthenticationError;
