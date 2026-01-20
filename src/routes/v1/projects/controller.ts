@@ -2,10 +2,25 @@ import { Request, Response } from "express";
 import prisma from "../../../prisma-client";
 import EntityNotFoundError from "../../../errors/EntityNotFoundError";
 import { repository } from "@/data/repositories";
+import { getPaginationParams } from "@/utils";
 
 export const listProjects = async (req: Request, res: Response) => {
-  const projects = await repository.listProjects({}, req.auth?.payload.sub);
-  res.status(200).json({ projects });
+  const { limit, offset, perPage, page } = getPaginationParams(req);
+
+  const result = await repository.listProjects(
+    {
+      limit,
+      offset,
+    },
+    req.auth?.payload.sub
+  );
+  res.status(200).json({
+    projects: result.projects,
+    page,
+    perP_page: perPage,
+    total_page: Math.ceil(result.totalCount / perPage),
+    total_count: result.totalCount,
+  });
 };
 
 export const getProject = async (req: Request, res: Response) => {
@@ -18,16 +33,17 @@ export const getProject = async (req: Request, res: Response) => {
 };
 
 export const listProjectTasks = async (req: Request, res: Response) => {
-  const tasks = await repository.listTasks(
-    { project_id: req.params.id as string },
+  const { limit, offset, perPage, page } = getPaginationParams(req);
+  const result = await repository.listTasks(
+    { project_id: req.params.id as string, limit, offset },
     req.auth?.payload.sub
   );
-  if (!tasks || tasks.length === 0)
-    throw new EntityNotFoundError({
-      message: "Tasks not found",
-      statusCode: 404,
-      code: "ERR_NF",
-    });
 
-  res.status(200).json([]);
+  res.status(200).json({
+    tasks: result.tasks,
+    page,
+    per_page: perPage,
+    total_page: Math.ceil(result.totalCount / perPage),
+    total_count: result.totalCount,
+  });
 };

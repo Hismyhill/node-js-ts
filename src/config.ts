@@ -3,9 +3,8 @@ const config = {
   port: parseInt(process.env.PORT ?? "3000"),
   debug: process.env.APP_DEBUG === "true",
   logLevel: process.env.LOG_LEVEL || "info",
-  db_url:
-    process.env.DATABASE_URL ||
-    "mysql://root:secret@localhost:33061/prisma_api",
+  defaultPageSize: parseInt(process.env.DEFAULT_PAGE_SIZE ?? "10"),
+  db_url: process.env.DATABASE_URL || "",
   db_port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 33061,
   host: process.env.DB_HOST || "localhost",
   db_user: process.env.DB_USER || "root",

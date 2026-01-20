@@ -3,6 +3,7 @@ import BaseRepository, { Constructor } from "./BaseRepository";
 import {
   IProject,
   IProjectQueryParams,
+  IProjectQueryResult,
   IProjectRepository,
   ITask,
 } from "./repository";
@@ -30,15 +31,19 @@ export function AddProjectRepository<TBase extends Constructor<BaseRepository>>(
     async listProjects(
       query: IProjectQueryParams,
       userId?: string
-    ): Promise<IProject[]> {
-      const projects = await this.client.project.findMany({
-        where: {
-          user_id: userId,
-        },
+    ): Promise<IProjectQueryResult> {
+      const where = {
+        user_id: userId,
+      };
 
-        take: query.limit || this.defaultLimit,
-        skip: query.offset || this.defaultOffset,
-      });
+      const [projects, count] = await this.client.$transaction([
+        this.client.project.findMany({
+          where,
+          take: query.limit || this.defaultLimit,
+          skip: query.offset || this.defaultOffset,
+        }),
+        this.client.project.count({ where }),
+      ]);
 
       if (!projects || projects.length === 0)
         throw new EntityNotFoundError({
@@ -47,7 +52,10 @@ export function AddProjectRepository<TBase extends Constructor<BaseRepository>>(
           code: "ERR_NF",
         });
 
-      return projects.map((project) => this.mapProject(project));
+      return {
+        projects: projects.map((project) => this.mapProject(project)),
+        totalCount: count,
+      };
     }
 
     async getProject(id: string, userId?: string): Promise<IProject> {

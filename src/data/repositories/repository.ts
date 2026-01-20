@@ -26,10 +26,23 @@ export interface ITaskQueryParams extends IQueryParams {
   project_id?: string;
 }
 
+export interface ITaskQueryResult {
+  tasks: ITask[];
+  totalCount: number;
+}
+
+export interface IProjectQueryResult {
+  projects: IProject[];
+  totalCount: number;
+}
+
 export interface IProjectQueryParams extends IQueryParams {}
 
 export interface ITaskRepository {
-  listTasks(query: ITaskQueryParams, userId?: string): Promise<ITask[]>;
+  listTasks(
+    query: ITaskQueryParams,
+    userId?: string
+  ): Promise<ITaskQueryResult>;
   getTask(id: string, userId?: string): Promise<ITask>;
   createTask(payload: Partial<ITask>, userId?: string): Promise<ITask>;
   updateTask(
@@ -43,7 +56,7 @@ export interface IProjectRepository {
   listProjects(
     query: IProjectQueryParams,
     userId?: string
-  ): Promise<IProject[]>;
+  ): Promise<IProjectQueryResult>;
   getProject(id: string, userId?: string): Promise<IProject>;
   getProjectTasks(
     query: IProjectQueryParams,
