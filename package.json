@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "dotenv -- tsc-watch --onsuccess \"node dist/index.js\"",
-    "build": "tsc",
-    "start": "dotenv -- node dist/index.js",
+    "dev": "dotenv -- tsc-watch --sourceMap --onsuccess \"node --enable-source-maps dist/index.js\"",
+    "build": "tsc --sourceMap",
+    "start": "dotenv -- node dist/index.js --enable-source-maps",
     "watch:dev": "ts-node src/index.ts --watch",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -31,6 +31,7 @@
     "@types/module-alias": "^2.0.4",
     "@types/morgan": "^1.9.10",
     "@types/node": "^25.0.8",
+    "@types/nodemailer": "^7.0.5",
     "dotenv-cli": "^11.0.0",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
@@ -60,6 +61,7 @@
     "mariadb": "^3.4.5",
     "module-alias": "^2.2.3",
     "morgan": "^1.10.1",
+    "nodemailer": "^7.0.12",
     "winston": "^3.19.0",
     "winston-daily-rotate-file": "^5.0.0"
   },

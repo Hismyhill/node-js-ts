@@ -6,6 +6,8 @@ import {
   getPaginationParams,
   parseTaskQueryParams,
 } from "@/utils";
+import { CreateTaskUseCase } from "@/use-cases/CreateTaskUseCase";
+import { mailer } from "@/services/mailer";
 
 export const listTasks = async (req: Request, res: Response) => {
   const { limit, offset, perPage, page } = getPaginationParams(req);
@@ -58,9 +60,10 @@ export const getTask = async (req: Request, res: Response) => {
 };
 
 export const createTask = async (req: Request, res: Response) => {
-  const task = await repository.createTask(req.body, req.auth?.payload.sub);
+  const createTaskUseCase = new CreateTaskUseCase(req, mailer);
+  const task = await createTaskUseCase.execute();
 
-  res.status(201).json({ task });
+  res.status(200).json({ task });
 };
 
 export const updateTask = async (req: Request, res: Response) => {
