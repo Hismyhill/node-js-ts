@@ -1,5 +1,6 @@
 import { Request } from "express";
 import config from "./config";
+import { ITaskQueryParams } from "./data/repositories/repository";
 
 export function add(a: number, b: number) {
   return a + b;
@@ -32,6 +33,38 @@ export function getPaginationParams(req: Request) {
     perPage: validPerPage,
     limit,
     offset,
+  };
+}
+
+export function parseTaskQueryParams(req: Request) {
+  const {
+    search,
+    completed: completedParam,
+    orderBy: orderByParam,
+  } = req.query;
+
+  let completed: boolean | undefined;
+  if (completedParam === "1" || completedParam === "true") completed = true;
+  else if (completedParam === "0" || completedParam === "false")
+    completed = false;
+  else completed = undefined;
+
+  let orderBy: ITaskQueryParams["orderBy"] = { created_at: "asc" };
+
+  if (typeof orderByParam === "string") {
+    const [field, direction] = orderByParam.split("-");
+    if (
+      ["created_at", "dur_date"].includes(field) &&
+      ["asc", "desc"].includes(direction)
+    ) {
+      orderBy = { [field]: direction as "asc" | "desc" };
+    }
+  }
+
+  return {
+    search: search as string | undefined,
+    completed,
+    orderBy,
   };
 }
 

@@ -17,42 +17,48 @@ export interface IProject {
   created_at: Date;
 }
 
-// interface IQueryParams {
-//   limit?: number;
-//   offset?: number;
-// }
-
 interface IQueryParams {
   limit?: number;
-  nextCursor?: string;
-  prevCursor?: string;
+  offset?: number;
 }
+
+// Cursor Pagination
+// interface IQueryParams {
+//   limit?: number;
+//   nextCursor?: string;
+//   prevCursor?: string;
+// }
 
 export interface ITaskQueryParams extends IQueryParams {
   project_id?: string;
+  search?: string;
+  completed?: boolean;
+  orderBy?: { [key in "created_at" | "due_date"]?: "asc" | "desc" };
 }
-
-// export interface ITaskQueryResult {
-//   tasks: ITask[];
-//   totalCount: number;
-// }
 
 export interface ITaskQueryResult {
   tasks: ITask[];
-  nextCursor: Date | null;
-  prevCursor: Date | null;
+  totalCount: number;
 }
 
-// export interface IProjectQueryResult {
-//   projects: ITask[];
-//   totalCount: number;
+// Cursor Pagination
+// export interface ITaskQueryResult {
+//   tasks: ITask[];
+//   nextCursor: Date | null;
+//   prevCursor: Date | null;
 // }
 
 export interface IProjectQueryResult {
   projects: IProject[];
-  nextCursor: Date | null;
-  prevCursor: Date | null;
+  totalCount: number;
 }
+
+//   Cursor pagination
+// export interface IProjectQueryResult {
+//   projects: IProject[];
+//   nextCursor: Date | null;
+//   prevCursor: Date | null;
+// }
 
 export interface IProjectQueryParams extends IQueryParams {}
 

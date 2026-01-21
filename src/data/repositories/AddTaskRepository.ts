@@ -7,6 +7,7 @@ import {
   ITaskRepository,
 } from "./repository";
 import EntityNotFoundError from "@/errors/EntityNotFoundError";
+import { getPaginationParams } from "@/utils";
 
 type PrismaTask = Prisma.TaskGetPayload<{}>;
 
@@ -31,40 +32,58 @@ export function AddTaskRespository<TBase extends Constructor<BaseRepository>>(
       query: ITaskQueryParams,
       userId?: string
     ): Promise<ITaskQueryResult> {
-      const { limit, sortOrder, operator, cursor } =
-        this.getPaginationQueryParams(query);
-      const where = {
+      const where: Prisma.TaskWhereInput = {
         user_id: userId,
         project_id: query.project_id,
-        created_at: { [operator]: cursor },
+
+        name: {
+          contains: query.search,
+        },
       };
 
-      const tasks = await this.client.task.findMany({
-        where,
-        take: limit + 1,
-        orderBy: {
-          created_at: sortOrder,
-        },
-      });
+      if (query.completed !== undefined) {
+        if (query.completed) {
+          where.completed_on = { not: null };
+        } else {
+          where.completed_on = null;
+        }
+      }
 
-      const { nextCursorTimestamp, prevCursorTimestamp } =
-        this.getPaginationCursors(query, tasks, limit, sortOrder);
+      // Cursor pagination
+      // const where = {
+      //   user_id: userId,
+      //   project_id: query.project_id,
+      //   // created_at: { [operator]: cursor },
+      // };
+      // const { limit, sortOrder, operator, cursor } =
+      //   this.getPaginationQueryParams(query);
 
-      if (sortOrder === "desc") tasks.reverse();
+      // const tasks = await this.client.task.findMany({
+      //   where,
+      //   take: limit + 1,
+      //   orderBy: {
+      //     created_at: sortOrder,
+      //   },
+      // });
 
-      // const [tasks, count] = await this.client.$transaction([
-      //   this.client.task.findMany({
-      //     where,
-      //     take: query.limit || this.defaultLimit,
-      //     skip: query.offset || this.defaultOffset,
-      //   }),
-      //   this.client.task.count({ where }),
-      // ]);
+      // const { nextCursorTimestamp, prevCursorTimestamp } =
+      //   this.getPaginationCursors(query, tasks, limit, sortOrder);
+
+      // if (sortOrder === "desc") tasks.reverse();
+
+      const [tasks, count] = await this.client.$transaction([
+        this.client.task.findMany({
+          where,
+          take: query.limit || this.defaultLimit,
+          skip: query.offset || this.defaultOffset,
+          orderBy: query.orderBy,
+        }),
+        this.client.task.count({ where }),
+      ]);
 
       return {
         tasks: tasks.map((task) => this.mapTask(task)),
-        prevCursor: prevCursorTimestamp,
-        nextCursor: nextCursorTimestamp,
+        totalCount: count,
       };
     }
 

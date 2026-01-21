@@ -32,40 +32,48 @@ export function AddProjectRepository<TBase extends Constructor<BaseRepository>>(
       query: IProjectQueryParams,
       userId?: string
     ): Promise<IProjectQueryResult> {
-      const { cursor, limit, operator, sortOrder } =
-        this.getPaginationQueryParams(query);
       const where = {
         user_id: userId,
-        created_at: { [operator]: cursor },
       };
-
-      const projects = await this.client.project.findMany({
-        where,
-        take: limit + 1,
-        orderBy: {
-          created_at: sortOrder,
-        },
-      });
-
-      const { nextCursorTimestamp, prevCursorTimestamp } =
-        this.getPaginationCursors(query, projects, limit, sortOrder);
-
-      if (sortOrder === "desc") projects.reverse();
-
-      //  const [projects, count] = await this.client.$transaction([
-      //       this.client.project.findMany({
-      //         where,
-      //         take: query.limit || this.defaultLimit,
-      //         skip: query.offset || this.defaultOffset,
-      //       }),
-      //       this.client.project.count({ where }),
-      //     ]);
+      const [projects, count] = await this.client.$transaction([
+        this.client.project.findMany({
+          where,
+          take: query.limit || this.defaultLimit,
+          skip: query.offset || this.defaultOffset,
+        }),
+        this.client.project.count({ where }),
+      ]);
 
       return {
         projects: projects.map((project) => this.mapProject(project)),
-        nextCursor: nextCursorTimestamp,
-        prevCursor: prevCursorTimestamp,
+        totalCount: count,
       };
+
+      // const { cursor, limit, operator, sortOrder } =
+      //   this.getPaginationQueryParams(query);
+      // const where = {
+      //   user_id: userId,
+      //   created_at: { [operator]: cursor },
+      // };
+
+      // const projects = await this.client.project.findMany({
+      //   where,
+      //   take: limit + 1,
+      //   orderBy: {
+      //     created_at: sortOrder,
+      //   },
+      // });
+
+      // const { nextCursorTimestamp, prevCursorTimestamp } =
+      //   this.getPaginationCursors(query, projects, limit, sortOrder);
+
+      // if (sortOrder === "desc") projects.reverse();
+
+      // return {
+      //   projects: projects.map((project) => this.mapProject(project)),
+      //   nextCursor: nextCursorTimestamp,
+      //   prevCursor: prevCursorTimestamp,
+      // };
     }
 
     async getProject(id: string, userId?: string): Promise<IProject> {
