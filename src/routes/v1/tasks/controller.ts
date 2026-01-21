@@ -1,9 +1,49 @@
 import { Request, Response } from "express";
 import { repository } from "@/data/repositories";
+import {
+  encodeBase64,
+  getCursorPaginationParams,
+  getPaginationParams,
+} from "@/utils";
+import { reset } from "module-alias";
 
 export const listTasks = async (req: Request, res: Response) => {
-  const tasks = await repository.listTasks({}, req.auth?.payload.sub);
-  res.status(200).json({ tasks });
+  // const { limit, offset, perPage, page } = getPaginationParams(req);
+
+  //  const result = await repository.listTasks(
+  //    {
+  //      limit,
+  //      offset,
+  //    },
+  //    req.auth?.payload.sub
+  //  );
+  //  res.status(200).json({
+  //    projects: result.tasks,
+  //    page,
+  //    perP_page: perPage,
+  //    total_page: Math.ceil(result.totalCount / perPage),
+  //    total_count: result.totalCount,
+  //  });
+
+  const { limit, nextCursor, prevCursor } = getCursorPaginationParams(req);
+  const result = await repository.listTasks(
+    {
+      limit,
+      prevCursor,
+      nextCursor,
+    },
+    req.auth?.payload.sub
+  );
+
+  res.status(200).json({
+    tasks: result.tasks,
+    nextCursor: result.nextCursor
+      ? encodeBase64(result.nextCursor.toISOString())
+      : null,
+    prevCursor: result.prevCursor
+      ? encodeBase64(result.prevCursor.toISOString())
+      : null,
+  });
 };
 
 export const getTask = async (req: Request, res: Response) => {

@@ -32,29 +32,39 @@ export function AddProjectRepository<TBase extends Constructor<BaseRepository>>(
       query: IProjectQueryParams,
       userId?: string
     ): Promise<IProjectQueryResult> {
+      const { cursor, limit, operator, sortOrder } =
+        this.getPaginationQueryParams(query);
       const where = {
         user_id: userId,
+        created_at: { [operator]: cursor },
       };
 
-      const [projects, count] = await this.client.$transaction([
-        this.client.project.findMany({
-          where,
-          take: query.limit || this.defaultLimit,
-          skip: query.offset || this.defaultOffset,
-        }),
-        this.client.project.count({ where }),
-      ]);
+      const projects = await this.client.project.findMany({
+        where,
+        take: limit + 1,
+        orderBy: {
+          created_at: sortOrder,
+        },
+      });
 
-      if (!projects || projects.length === 0)
-        throw new EntityNotFoundError({
-          message: "No Project found",
-          statusCode: 404,
-          code: "ERR_NF",
-        });
+      const { nextCursorTimestamp, prevCursorTimestamp } =
+        this.getPaginationCursors(query, projects, limit, sortOrder);
+
+      if (sortOrder === "desc") projects.reverse();
+
+      //  const [projects, count] = await this.client.$transaction([
+      //       this.client.project.findMany({
+      //         where,
+      //         take: query.limit || this.defaultLimit,
+      //         skip: query.offset || this.defaultOffset,
+      //       }),
+      //       this.client.project.count({ where }),
+      //     ]);
 
       return {
         projects: projects.map((project) => this.mapProject(project)),
-        totalCount: count,
+        nextCursor: nextCursorTimestamp,
+        prevCursor: prevCursorTimestamp,
       };
     }
 
@@ -76,29 +86,25 @@ export function AddProjectRepository<TBase extends Constructor<BaseRepository>>(
       return this.mapProject(project);
     }
 
-    async getProjectTasks(
-      query: IProjectQueryParams,
-      id: string,
-      userId?: string
-    ): Promise<ITask[]> {
-      const tasks = await this.client.task.findMany({
-        where: {
-          id,
-          user_id: userId,
-        },
+    // async getProjectTasks(
+    //   query: IProjectQueryParams,
+    //   id: string,
+    //   userId?: string
+    // ): Promise<ITask[]> {
+    //   const where = {
+    //     project_id: id,
+    //     user_id: userId,
+    //   };
+    //   const [tasks, count] = await this.client.$transaction(
+    //     this.client.task.findMany({
+    //       where,
+    //       take: query.limit || this.defaultLimit,
+    //       skip: query.offset || this.defaultOffset,
+    //     }),
+    //     this.client.project.count({ where })
+    //   );
 
-        take: query.limit || this.defaultLimit,
-        skip: query.offset || this.defaultOffset,
-      });
-
-      if (!tasks || tasks.length === 0)
-        throw new EntityNotFoundError({
-          message: "No Task found",
-          statusCode: 404,
-          code: "ERR_NF",
-        });
-
-      return tasks;
-    }
+    //   return { tasks: tasks.map((task) => mapTask(task)), totalCount: count };
+    // }
   };
 }

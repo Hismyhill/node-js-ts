@@ -31,30 +31,40 @@ export function AddTaskRespository<TBase extends Constructor<BaseRepository>>(
       query: ITaskQueryParams,
       userId?: string
     ): Promise<ITaskQueryResult> {
+      const { limit, sortOrder, operator, cursor } =
+        this.getPaginationQueryParams(query);
       const where = {
         user_id: userId,
         project_id: query.project_id,
+        created_at: { [operator]: cursor },
       };
 
-      const [tasks, count] = await this.client.$transaction([
-        this.client.task.findMany({
-          where,
-          take: query.limit || this.defaultLimit,
-          skip: query.offset || this.defaultOffset,
-        }),
-        this.client.task.count({where})
-      ]);
+      const tasks = await this.client.task.findMany({
+        where,
+        take: limit + 1,
+        orderBy: {
+          created_at: sortOrder,
+        },
+      });
 
-      if (!tasks || tasks.length === 0)
-        throw new EntityNotFoundError({
-          message: "No Task found",
-          statusCode: 404,
-          code: "ERR_NF",
-        });
+      const { nextCursorTimestamp, prevCursorTimestamp } =
+        this.getPaginationCursors(query, tasks, limit, sortOrder);
+
+      if (sortOrder === "desc") tasks.reverse();
+
+      // const [tasks, count] = await this.client.$transaction([
+      //   this.client.task.findMany({
+      //     where,
+      //     take: query.limit || this.defaultLimit,
+      //     skip: query.offset || this.defaultOffset,
+      //   }),
+      //   this.client.task.count({ where }),
+      // ]);
 
       return {
         tasks: tasks.map((task) => this.mapTask(task)),
-        totalCount: count,
+        prevCursor: prevCursorTimestamp,
+        nextCursor: nextCursorTimestamp,
       };
     }
 

@@ -17,23 +17,41 @@ export interface IProject {
   created_at: Date;
 }
 
+// interface IQueryParams {
+//   limit?: number;
+//   offset?: number;
+// }
+
 interface IQueryParams {
   limit?: number;
-  offset?: number;
+  nextCursor?: string;
+  prevCursor?: string;
 }
 
 export interface ITaskQueryParams extends IQueryParams {
   project_id?: string;
 }
 
+// export interface ITaskQueryResult {
+//   tasks: ITask[];
+//   totalCount: number;
+// }
+
 export interface ITaskQueryResult {
   tasks: ITask[];
-  totalCount: number;
+  nextCursor: Date | null;
+  prevCursor: Date | null;
 }
+
+// export interface IProjectQueryResult {
+//   projects: ITask[];
+//   totalCount: number;
+// }
 
 export interface IProjectQueryResult {
   projects: IProject[];
-  totalCount: number;
+  nextCursor: Date | null;
+  prevCursor: Date | null;
 }
 
 export interface IProjectQueryParams extends IQueryParams {}
@@ -58,9 +76,4 @@ export interface IProjectRepository {
     userId?: string
   ): Promise<IProjectQueryResult>;
   getProject(id: string, userId?: string): Promise<IProject>;
-  getProjectTasks(
-    query: IProjectQueryParams,
-    id: string,
-    userId?: string
-  ): Promise<ITask[]>;
 }
