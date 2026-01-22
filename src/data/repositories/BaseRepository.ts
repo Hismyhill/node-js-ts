@@ -9,10 +9,10 @@ export default class BaseRepository {
   protected client: PrismaClient;
   constructor() {
     const adapter = new PrismaMariaDb({
-      host: config.host || "localhost",
-      port: config.db_port || 33061,
-      user: config.db_user,
-      password: config.db_password,
+      host: config.db.host || "localhost",
+      port: config.db.port || 33061,
+      user: config.db.user,
+      password: config.db.password,
       database: "prisma_api",
     });
     this.client = new PrismaClient({ adapter });

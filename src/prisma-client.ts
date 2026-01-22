@@ -3,10 +3,10 @@ import { PrismaClient } from "./generated/prisma/client";
 import config from "./config";
 
 const adapter = new PrismaMariaDb({
-  host: config.host || "localhost",
-  port: config.db_port || 33061,
-  user: config.db_user,
-  password: config.db_password,
+  host: config.db.host,
+  port: config.db.port,
+  user: config.db.user,
+  password: config.db.password,
   database: "prisma_api",
 });
 
