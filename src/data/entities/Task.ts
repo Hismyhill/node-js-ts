@@ -9,7 +9,7 @@ export class Task implements ITask {
   description: string | null;
   due_date: Date | null;
   completed_on: Date | null;
-  @Exclude({ toClassOnly: true })
+  @Exclude({ toPlainOnly: true })
   created_at: Date;
 
   constructor(
@@ -43,15 +43,14 @@ export class Task implements ITask {
 
     const today = new Date();
     const oneDayFromNow = new Date();
-    const daysFromNow = new Date();
+    const threeDaysFromNow = new Date();
     oneDayFromNow.setDate(today.getDate() + 1);
-    daysFromNow.setDate(today.getDate() + 3);
+    threeDaysFromNow.setDate(today.getDate() + 3);
 
-    return this.due_date <= oneDayFromNow
-      ? "high"
-      : this.due_date <= daysFromNow
-        ? "medium"
-        : "low";
+    if (this.due_date <= oneDayFromNow) return "high";
+    if (this.due_date <= threeDaysFromNow) return "medium";
+    if (this.due_date > threeDaysFromNow) return "low";
+    else return null;
   }
 
   @Expose({ name: "priority_level" })
