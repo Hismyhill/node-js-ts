@@ -21,25 +21,25 @@ const logger = winston.createLogger({
     winston.format.printf(
       ({ timestamp, level, message, logMetaData, stack }) => {
         return `${timestamp} ${level}: ${logMetaData || ""} ${message} ${stack || ""}`;
-      }
-    )
+      },
+    ),
   ),
   transports: [new winston.transports.Console()],
 });
 
-const fileRotateTransport = new DailyRotateFile({
-  filename: "logs/application-%DATE%.log",
-  datePattern: "YYYY-MM-DD-HH",
-  zippedArchive: true,
-  maxSize: "20m",
-  maxFiles: "14d",
-  format: winston.format.combine(
-    winston.format.errors({ stack: true }),
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
-});
+// const fileRotateTransport = new DailyRotateFile({
+//   filename: "logs/application-%DATE%.log",
+//   datePattern: "YYYY-MM-DD-HH",
+//   zippedArchive: true,
+//   maxSize: "20m",
+//   maxFiles: "14d",
+//   format: winston.format.combine(
+//     winston.format.errors({ stack: true }),
+//     winston.format.timestamp(),
+//     winston.format.json()
+//   ),
+// });
 
-logger.add(fileRotateTransport);
+// logger.add(fileRotateTransport);
 
 export default logger;

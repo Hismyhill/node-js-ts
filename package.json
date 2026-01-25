@@ -6,6 +6,7 @@
     "dev": "dotenv -- tsc-watch --sourceMap --onsuccess \"node --enable-source-maps dist/index.js\"",
     "build": "tsc --sourceMap",
     "start": "dotenv -- node dist/index.js --enable-source-maps",
+    "docker-start": "npm run migrate && node dist/index.js --enable-source-maps",
     "watch:dev": "ts-node src/index.ts --watch",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -42,7 +43,6 @@
     "jest": "^30.2.0",
     "jiti": "^2.6.1",
     "prettier": "^3.7.4",
-    "prisma": "^7.2.0",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.6",
     "tsc-watch": "^7.2.0",
@@ -55,6 +55,7 @@
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.2.0",
     "@prisma/client": "^7.2.0",
+    "prisma": "^7.2.0",
     "class-transformer": "^0.5.1",
     "cors": "^2.8.5",
     "eslint-plugin-jest": "^29.12.1",

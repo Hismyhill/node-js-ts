@@ -14,6 +14,7 @@ RUN apk add --no-cache openssl
 WORKDIR /app
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/prisma.config.ts .
 COPY --from=builder /app/package.json .
 COPY --from=builder /app/package-lock.json .
 RUN npm ci --omit=dev
@@ -25,9 +26,10 @@ RUN apk add --no-cache libc6-compat
 RUN apk add --no-cache openssl
 WORKDIR /app
 # Don't run production as root
-RUN addgroup --system --gid 1001 expressjs
-RUN adduser --system --gid 1001 expressjs
+RUN addgroup -S -g 1001 expressjs
+RUN adduser -S -u 1001 -G expressjs expressjs
 USER expressjs
-COPY --from=installer /app .
+COPY --from=installer --chown=expressjs:expressjs /app .
 
+EXPOSE 3000
 CMD [ "npm", "run", "docker-start" ]
