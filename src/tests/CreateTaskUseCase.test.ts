@@ -22,7 +22,7 @@ describe("CreateTaskUseCase", () => {
   beforeEach(() => {
     req = {
       body: { name: "Test task" },
-      auth: { payload: { sub: "user123" } },
+      auth:  { sub: "user123" } ,
     } as Request;
 
     mailer = {

@@ -16,7 +16,7 @@ export const listProjects = async (req: Request, res: Response) => {
       limit,
       offset,
     },
-    req.auth?.payload.sub
+    req.auth?.sub,
   );
 
   res.status(200).json({
@@ -35,7 +35,7 @@ export const listProjects = async (req: Request, res: Response) => {
   //       nextCursor,
   //       prevCursor,
   //     },
-  //     req.auth?.payload.sub
+  //     req.auth?.sub
   //   );
   //   res.status(200).json({
   //     projects: result.projects,
@@ -51,7 +51,7 @@ export const listProjects = async (req: Request, res: Response) => {
 export const getProject = async (req: Request, res: Response) => {
   const project = await repository.getProject(
     req.params.id as string,
-    req.auth?.payload.sub
+    req.auth?.sub,
   );
 
   res.status(200).json({ project });
@@ -61,7 +61,7 @@ export const listProjectTasks = async (req: Request, res: Response) => {
   const { limit, offset, perPage, page } = getPaginationParams(req);
   const result = await repository.listTasks(
     { project_id: req.params.id as string, limit, offset },
-    req.auth?.payload.sub
+    req.auth?.sub,
   );
 
   res.status(200).json({
@@ -76,7 +76,7 @@ export const listProjectTasks = async (req: Request, res: Response) => {
   // const { limit, nextCursor, prevCursor } = getCursorPaginationParams(req);
   // const result = await repository.listTasks(
   //   { project_id: req.params.id as string, limit, nextCursor, prevCursor },
-  //   req.auth?.payload.sub
+  //   req.auth?.sub
   // );
 
   // res.status(200).json({

@@ -23,6 +23,11 @@ const config = {
     password: process.env.MAIL_PASSWORD || "",
   },
   adminEmail: process.env.ADMIN_EMAIL || "",
+  cognito: {
+    awsRegion: process.env.AWS_REGION,
+    clientId: process.env.COGNITO_CLIENT_ID,
+    userPool: process.env.COGNITO_USER_POOL_ID || "",
+  },
 };
 
 export default config;

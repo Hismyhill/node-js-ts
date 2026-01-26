@@ -22,7 +22,7 @@ export const listTasks = async (req: Request, res: Response) => {
       offset,
       ...queryParams,
     },
-    req.auth?.payload.sub,
+    req.auth?.sub,
   );
 
   const tasks = result.tasks.map((taskData) => plainToInstance(Task, taskData));
@@ -42,7 +42,7 @@ export const listTasks = async (req: Request, res: Response) => {
   //     prevCursor,
   //     nextCursor,
   //   },
-  //   req.auth?.payload.sub
+  //   req.auth?.sub
   // );
 
   // res.status(200).json({
@@ -59,7 +59,7 @@ export const listTasks = async (req: Request, res: Response) => {
 export const getTask = async (req: Request, res: Response) => {
   const taskData = await repository.getTask(
     req.params.id as string,
-    req.auth?.payload.sub,
+    req.auth?.sub,
   );
   const task = plainToInstance(Task, taskData);
   res.status(200).json({ task: task.asDto() });
@@ -75,14 +75,10 @@ export const createTask = async (req: Request, res: Response) => {
 export const updateTask = async (req: Request, res: Response) => {
   const taskData = await repository.getTask(
     req.params.id as string,
-    req.auth?.payload.sub,
+    req.auth?.sub,
   );
   const task = plainToInstance(Task, taskData);
-  await repository.updateTask(
-    req.params.id as string,
-    req.body,
-    req.auth?.payload.sub,
-  );
+  await repository.updateTask(req.params.id as string, req.body, req.auth?.sub);
 
   res.status(200).json({ task: task.asDto() });
 };
@@ -90,15 +86,11 @@ export const updateTask = async (req: Request, res: Response) => {
 export const markTaskAsCompleted = async (req: Request, res: Response) => {
   const taskData = await repository.getTask(
     req.params.id as string,
-    req.auth?.payload.sub,
+    req.auth?.sub,
   );
   const task = plainToInstance(Task, taskData);
   task.markAsCompleted();
-  await repository.updateTask(
-    req.params.id as string,
-    task,
-    req.auth?.payload.sub,
-  );
+  await repository.updateTask(req.params.id as string, task, req.auth?.sub);
 
   res.status(200).json({ task: task.asDto() });
 };

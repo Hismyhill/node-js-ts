@@ -16,7 +16,7 @@ describe("CreateTask", () => {
   beforeEach(() => {
     req = {
       body: { name: "New task" },
-      auth: { payload: { sub: "user123" } },
+      auth: { sub: "user123" },
     } as Request;
     jsonMock = jest.fn();
     statusMock = jest.fn().mockReturnValue({ json: jsonMock });

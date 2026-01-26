@@ -7,14 +7,11 @@ import { Request } from "express";
 export class CreateTaskUseCase {
   constructor(
     protected req: Request,
-    protected mailer: IMailer
+    protected mailer: IMailer,
   ) {}
 
   async execute() {
-    const task = await repository.createTask(
-      this.req.body,
-      this.req.auth?.payload.sub
-    );
+    const task = await repository.createTask(this.req.body, this.req.auth?.sub);
 
     this.mailer
       .send({
