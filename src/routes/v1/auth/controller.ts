@@ -1,12 +1,14 @@
 import express, { Request, Response } from "express";
 import config from "@/config";
 import {
+  AttributeType,
   AuthFlowType,
   CognitoIdentityProviderClient,
   ConfirmSignUpCommand,
   GlobalSignOutCommand,
   InitiateAuthCommand,
   SignUpCommand,
+  UpdateUserAttributesCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import AuthenticationError from "@/errors/AuthenticationError";
 import logger from "@/logger";
@@ -95,6 +97,39 @@ export const login = async (req: Request, res: Response) => {
       expires_in: tokens.ExpiresIn,
     },
   });
+};
+
+export const updateProfile = async (req: Request, res: Response) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    throw new EntityNotFoundError({
+      message: "Access token is required",
+      statusCode: 401,
+      code: "ERR_AUTH",
+    });
+  }
+
+  const accessToken = authHeader.replace("Bearer ", "");
+
+  const { attributes }: { attributes: AttributeType[] } = req.body;
+
+  if (!attributes || !Array.isArray(attributes)) {
+    throw new AuthenticationError({
+      message: "Request body must include an 'attributes' array.",
+      statusCode: 400,
+      code: "ERR_VALID",
+    });
+  }
+
+  const command = new UpdateUserAttributesCommand({
+    AccessToken: accessToken,
+    UserAttributes: attributes,
+  });
+
+  await client.send(command);
+
+  res.status(200).json({ message: "User profile updated successfully" });
 };
 
 export const logout = async (req: Request, res: Response) => {

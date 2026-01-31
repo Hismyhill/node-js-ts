@@ -8,6 +8,7 @@
     "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true,
     "baseUrl": ".",
+    "allowJs": true,
     "paths": {
       "@/*": ["src/*"],
       "@errors/": ["src/errors/*"]
